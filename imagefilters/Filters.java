@@ -94,6 +94,30 @@ public class Filters {
         return outImage;
     }
     
+    //for negative
+    public static Image negativeImage(Image originalImage){
+        IMG = originalImage;
+        W = (int)originalImage.getWidth();
+        H = (int)originalImage.getHeight();
+        pr = originalImage.getPixelReader();
+        
+        //code for b&w
+        outImage = new WritableImage(W, H);
+        pw = outImage.getPixelWriter();
+        for(int y=0;y<H;y++){
+            for(int x=0;x<W;x++){
+                Color color = pr.getColor(x, y);
+                double newR = 1.0 - color.getRed();
+                double newG = 1.0 - color.getGreen();
+                double newB = 1.0 - color.getBlue();
+                Color newColor = Color.color(newR, newG, newB);
+                pw.setColor(x, y, newColor);
+            }
+        }
+        return outImage;
+    }
+    
+    
     public static File getTextOutPut(Image originalImage) throws IOException{
         IMG = originalImage;
         int iW = (int)IMG.getWidth();
