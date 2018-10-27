@@ -19,7 +19,7 @@ public class imagePixels extends Application{
 	private double mouseY;
 	private Paint p = Color.rgb(155, 122, 166);
 	private double t = 0.0;
-	private Image img = new Image("file:\\E:\\Shriprakash\\pics\\JPG\\alexandra-daddario-topless.jpg");
+	private Image img = new Image("file:\\E:\\Images\\Alexandra_Daddario.jpg");
 	private PixelReader pr = img.getPixelReader();
 	private double X=0, Y=300;
 
