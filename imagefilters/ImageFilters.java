@@ -21,6 +21,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.FileChooser;
@@ -41,6 +42,9 @@ public class ImageFilters extends Application{
     private Button applyFilter, chBT, saveBT;
     private Label Flb, Ilb;
     private File inImage;
+    private boolean flagForBlackBG = true, textViewSelected = false;
+    private Scene scene;
+    private TextArea textView;
     
     
     private void log(Object o){System.out.println(o);}
@@ -83,6 +87,9 @@ public class ImageFilters extends Application{
                 imageV.setImage(img);
                 //imgBox.getChildren().add(imageV);
             }
+            if(!pane.getChildren().contains(imgBox)){
+                pane.getChildren().add(imgBox);
+            }            
             
         });
         
@@ -98,7 +105,11 @@ public class ImageFilters extends Application{
                 if(((String)cb.getValue()).equals("Blur")){                    
                     modifiedImage = Filters.normalBlur(originalImage);
                     originalImage = modifiedImage;
-                    
+                    textViewSelected = false;
+                    if(pane.getChildren().contains(textView)){
+                        pane.getChildren().remove(textView);
+                        pane.getChildren().add(imgBox);
+                    }
                     if(modifiedImage != null){
                         modV.setFitWidth(400);
                         modV.setFitHeight(500);
@@ -109,7 +120,12 @@ public class ImageFilters extends Application{
                 }else if(((String)cb.getValue()).equals("B&W")){                    
                     modifiedImage = Filters.blackandwhiteImage(originalImage);
                     originalImage = modifiedImage;
-                    
+                    flagForBlackBG = true;
+                    textViewSelected = false;
+                    if(pane.getChildren().contains(textView)){
+                        pane.getChildren().remove(textView);
+                        pane.getChildren().add(imgBox);
+                    }
                     if(modifiedImage != null){
                         modV.setFitWidth(400);
                         modV.setFitHeight(500);
@@ -120,34 +136,38 @@ public class ImageFilters extends Application{
                     }
                     
                 }else if(((String)cb.getValue()).equals("ImageToText")){
-                    TextArea textView = new TextArea();
+                    textView = new TextArea();
                     textView.autosize();
                     textView.setLayoutY(60);
+                    textView.setEditable(false);
+                    textView.setWrapText(false);
                     textView.setPrefSize(800, 540);
-                    textView.setFont(Font.font("Consolas", FontPosture.REGULAR, 1));
-                    List<String> lines = new ArrayList<String>();
-                    String line;
-                    
-                    try {
-                        File imgText = Filters.getTextOutPut(originalImage);
-                        BufferedReader br = new BufferedReader(new FileReader(imgText));
-                        
-                        while(br.readLine() != null){
-                            line = br.readLine();
-                            lines.add(line);
-                        }
-                        br.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(ImageFilters.class.getName()).log(Level.SEVERE, null, ex);
+                    if(flagForBlackBG){
+                        textView.setStyle("text-area-background: black;-fx-text-fill: white;");
                     }
-                    for(String l : lines){
-                        textView.appendText(l+"\n");
-                    }
-                    //textView.setText("Jai baram baba");
+                    textView.setFont(Font.font("Monospaced", FontPosture.REGULAR, 5));
+                    textView.setText(Filters.getTextOutPut(originalImage));
+                    textViewSelected = true;
                     pane.getChildren().remove(imgBox);
                     pane.getChildren().add(1, textView);
+                }else if(((String)cb.getValue()).equals("InvertColor")){
+                    modifiedImage = Filters.negativeImage(originalImage);
+                    originalImage = modifiedImage;
+                    flagForBlackBG = true;
+                    textViewSelected = false;
+                    if(pane.getChildren().contains(textView)){
+                        pane.getChildren().remove(textView);
+                        pane.getChildren().add(imgBox);
+                    }
+                    if(modifiedImage != null){
+                        modV.setFitWidth(400);
+                        modV.setFitHeight(500);
+                        modV.setLayoutY(60);
+                        modV.setImage(modifiedImage);
+                        //imgBox.getChildren().add(modV);
+                        System.out.println("B&W applied");
+                    }
                 }
-                
             }
         });
         
@@ -158,10 +178,22 @@ public class ImageFilters extends Application{
                 new FileChooser.ExtensionFilter("Image", exts)
             );
             File outImage = fc.showSaveDialog(stage);
-            if(outImage == null){
+            if(textViewSelected){
+                SnapshotParameters snapshotParameters = new SnapshotParameters();
+                snapshotParameters.setFill(Color.TRANSPARENT);
+                Image snapImage = textView.snapshot(snapshotParameters, null);
+                
+                if(outImage == null){
                 System.out.println("Please select where to save.");
-            }else{
-                saveToFile(modifiedImage, outImage.getAbsolutePath());
+                }else{
+                    saveToFile(snapImage, outImage.getAbsolutePath());                
+                }
+            } else {
+                if(outImage == null){
+                    System.out.println("Please select where to save.");
+                }else{
+                    saveToFile(modifiedImage, outImage.getAbsolutePath());
+                }
             }
         });
         
@@ -178,7 +210,7 @@ public class ImageFilters extends Application{
         
         
         //--------------------------------------------------------------
-        pane.getChildren().addAll(hbox, imgBox);
+        pane.getChildren().add(hbox);
         return pane;
     }
     
@@ -207,8 +239,10 @@ public class ImageFilters extends Application{
     }
     
     public void start(Stage primaryStage) throws Exception{
+        scene = new Scene(getPane(), W, H);
+        scene.getStylesheets().add("textAreaStyle.css");
         stage = primaryStage;
-        stage.setScene(new Scene(getPane(), W, H));
+        stage.setScene(scene);
         stage.show();
     }
     

@@ -33,6 +33,9 @@ public class Filters {
     private static FileOutputStream fos;
     private static BufferedWriter bw;
     
+    //for textoutput
+    private static StringBuilder sb;
+    
     
     //for blur
     public static Image normalBlur(Image originalImage){
@@ -118,49 +121,119 @@ public class Filters {
     }
     
     
-    public static File getTextOutPut(Image originalImage) throws IOException{
-        IMG = originalImage;
-        int iW = (int)IMG.getWidth();
-        int iH = (int)IMG.getHeight();
+    
+    public static String getTextOutPut(Image image){
+        int iW = (int)image.getWidth();
+        int iH = (int)image.getHeight();
         pixels = new double[iH][iW];
-        pr = originalImage.getPixelReader();
+        sb = new StringBuilder((iW+1)*iH);
+        pr = image.getPixelReader();
         
-        try {
-            file = new File("imageOut.txt");
-            fos = new FileOutputStream(file);
-            bw = new BufferedWriter(new OutputStreamWriter(fos));
-
-             for(int y=0;y<iH;y++){
-                for(int x=0;x<iW;x++){
-                    c = pr.getColor(x, y);
-                    pixels[y][x] = Double.parseDouble(formatter.format((c.getBrightness())));
-                    if(pixels[y][x]*10 == 0.0){
-                        bw.write('#');
-                        //System.out.print("#");
-                    }
-                    if(pixels[y][x]*10 == 1.0){
-                        bw.write('.');
-                        //System.out.print(".");
-                    }
-                    int i;
-                    if((i = (int)(pixels[y][x]*10)-1) == -1){
-                        i = 0;
-                    }
-                    bw.write(pix[i]);
-                    //System.out.print(pix[i]);
-                }
-                
-                bw.newLine();
-                //System.out.print("\n");
+        for(int y=0;y<iH;y++){
+            if(sb.length() != 0)sb.append("\n");
+            for(int x=0;x<iW;x++){
+                c = pr.getColor(x, y);
+                pixels[y][x] = Double.parseDouble(formatter.format((c.getBrightness())))*100;
+                //log(pixels[y][x]);
+                sb.append(stringFetcher(pixels[y][x])); 
             }
-            bw.close();
-            
-            
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Filters.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;
-
+        return sb.toString();
     }
+    
+    
+    private static char stringFetcher(double g){
+        final char str;
+
+		if (g >= 95.0) {
+			str = ' ';
+		} else if (g >= 90.0) {
+			str = '.';
+		} else if (g >= 85.0) {
+			str = ',';
+		} else if (g >= 80.0) {
+			str = ':';
+		} else if (g >= 75.0) {
+			str = ';';
+		} else if (g >= 70.0) {
+			str = 'i';
+		} else if (g >= 65.0) {
+			str = 'r';
+		} else if (g >= 60.0) {
+			str = 'j';
+                } else if (g >= 55.0) {
+                        str = 'l';
+                } else if (g >= 50.0){
+                        str = 'b';
+                } else if (g >= 45.0){
+                        str = 'd';
+                } else if (g >= 40.0){
+                        str = 'h';
+                } else if (g >= 35.0){
+                        str = '6';
+                } else if (g >= 30.0){
+                        str = '9';
+                } else if (g >= 25.0){
+                        str = '8';
+                } else if (g >= 20.0){
+                        str = 'B';
+                } else if (g >= 15.0){
+                        str = 'Q';
+                } else if (g >= 10.0){
+                        str = '&';
+                } else if (g >= 5.0){
+                        str = '#';
+		} else {
+			str = '@';
+		}
+		return str;
+    }
+    
+    
+    
+//    public static File getTextOutPut(Image originalImage) throws IOException{
+//        IMG = originalImage;
+//        int iW = (int)IMG.getWidth();
+//        int iH = (int)IMG.getHeight();
+//        pixels = new double[iH][iW];
+//        pr = originalImage.getPixelReader();
+//        
+//        try {
+//            file = new File("imageOut.txt");
+//            fos = new FileOutputStream(file);
+//            bw = new BufferedWriter(new OutputStreamWriter(fos));
+//
+//             for(int y=0;y<iH;y++){
+//                for(int x=0;x<iW;x++){
+//                    c = pr.getColor(x, y);
+//                    pixels[y][x] = Double.parseDouble(formatter.format((c.getBrightness())));
+//                    if(pixels[y][x]*10 == 0.0){
+//                        bw.write('#');
+//                        //System.out.print("#");
+//                    }
+//                    if(pixels[y][x]*10 == 1.0){
+//                        bw.write('.');
+//                        //System.out.print(".");
+//                    }
+//                    int i;
+//                    if((i = (int)(pixels[y][x]*10)-1) == -1){
+//                        i = 0;
+//                    }
+//                    bw.write(pix[i]);
+//                    //System.out.print(pix[i]);
+//                }
+//                
+//                bw.newLine();
+//                //System.out.print("\n");
+//            }
+//            bw.close();
+//            
+//            
+//            
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Filters.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return file;
+//
+//    }
 }
