@@ -5,7 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 /**
  *
- * @author shripc
+ * @author shri
  */
 public class Digit {
     private Color color;
