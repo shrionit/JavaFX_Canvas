@@ -1,5 +1,9 @@
 import javafx.application.Application;
+
+import java.io.File;
+
 import javafx.animation.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage; 
 import javafx.scene.*;
 import javafx.scene.layout.*;
@@ -14,15 +18,23 @@ public class imagePixels extends Application{
 	private final double H = 600;
 	private Canvas canvas;
 	private GraphicsContext gc;
-	private ColorPicker cp;
+    private ColorPicker cp;
+    private Stage window;
 	private double mouseX;
 	private double mouseY;
 	private Paint p = Color.rgb(155, 122, 166);
 	private double t = 0.0;
-	private Image img = new Image("file:\\E:\\Shriprakash\\pics\\JPG\\alexandra-daddario-topless.jpg");
-	private PixelReader pr = img.getPixelReader();
+	private Image img;
+	private PixelReader pr;
 	private double X=0, Y=300;
 
+    public imagePixels(){
+		FileChooser chooser = new FileChooser();
+		File file = chooser.showOpenDialog(window);
+		Image image = new Image("file:\\"+file.getAbsolutePath());
+		img = image;
+		pr = img.getPixelReader();
+	}
 
 
 	private void setup(){
@@ -87,7 +99,7 @@ public class imagePixels extends Application{
 	private void path(String anime){
 
 		if(anime.equals("anime1")){
-			Y = 300+Math.sin(t/0.5)*100;
+			Y = 300+Math.sin(t*0.5)*100;
 			X++;
 		}else if(anime.equals("anime2")){
 			Y = 300 + Math.cos(t/0.5)*100;
@@ -120,7 +132,7 @@ public class imagePixels extends Application{
 		AnimationTimer timer = new AnimationTimer(){
 			@Override
 			public void handle(long now){
-				t += 0.01;
+				t += 0.001;
 				//X++;
 				draw();
 			}
@@ -131,6 +143,7 @@ public class imagePixels extends Application{
 	}
 
 	public void start(Stage stage) throws Exception{
+        window = stage;
 		stage.setScene(new Scene(getRoot(), W, H));
 		stage.show();
 	}
